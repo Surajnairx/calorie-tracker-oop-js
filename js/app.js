@@ -110,12 +110,63 @@ class Workout {
   }
 }
 
-const tracker = new CalorieTracker();
-const breakfast = new Meal("breakfast", 2);
-const lunch = new Meal("lunch", 1999);
+class App {
+  constructor() {
+    this._tracker = new CalorieTracker();
 
-tracker.addMeal(breakfast);
-tracker.addMeal(lunch);
+    document
+      .querySelector("#meal-form")
+      .addEventListener("submit", this._newMeal.bind(this));
 
-const run = new Workout("Morning Jog", 300);
-tracker.addWorkout(run);
+    document
+      .querySelector("#workout-form")
+      .addEventListener("submit", this._newWorkout.bind(this));
+  }
+
+  _newMeal(e) {
+    e.preventDefault();
+    const name = document.querySelector("#meal-name");
+    const calories = document.querySelector("#meal-calories");
+    console.log(name.value, calories.value);
+
+    //validation
+    if (name.value === "" || calories.value === "") {
+      alert("Please fill in all details");
+    }
+
+    //remember the value is still a string!
+    const meal = new Meal(name.value, Number(calories.value));
+    this._tracker.addMeal(meal);
+
+    name.value = "";
+    calories.value = "";
+
+    const collapseMeal = document.getElementById("collapse-meal");
+
+    const bsCollapse = new bootstrap.Collapse(collapseMeal, { toggle: true });
+  }
+  _newWorkout(e) {
+    e.preventDefault();
+    console.log(this);
+    const name = document.querySelector("#workout-name");
+    const calories = document.querySelector("#workout-calories");
+
+    if (name.value === "" || calories.value === "") {
+      alert("Please fill in all details");
+    }
+
+    const workout = new Workout(name.value, Number(calories.value));
+    this._tracker.addWorkout(workout);
+
+    name.value = "";
+    calories.value = "";
+
+    const collapseWorkout = document.getElementById("collapse-workout");
+
+    const bsCollapse = new bootstrap.Collapse(collapseWorkout, {
+      toggle: true,
+    });
+  }
+}
+
+const app = new App();
