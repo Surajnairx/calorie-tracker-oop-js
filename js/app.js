@@ -1,6 +1,6 @@
 class CalorieTracker {
   constructor() {
-    this._calorieLimit = 2200;
+    this._calorieLimit = 2500;
     this._totalCalories = 0;
     this._meals = [];
     this._workout = [];
@@ -16,12 +16,14 @@ class CalorieTracker {
   addMeal(meal) {
     this._meals.push(meal);
     this._totalCalories += meal.calories;
+    this._displayNewMeal(meal);
     this._render();
   }
 
   addWorkout(workout) {
     this._workout.push(workout);
     this._totalCalories -= workout.calories;
+    this._displayNewWorkout(workout);
     this._render();
   }
 
@@ -76,6 +78,48 @@ class CalorieTracker {
     }
   }
 
+  _displayNewMeal(meal) {
+    const mealsEL = document.getElementById("meal-items");
+    const mealEL = document.createElement("div");
+    mealEL.classList.add("card", "my-2");
+    mealEL.setAttribute("data-id", meal.id);
+    mealEL.innerHTML = `<div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                  <h4 class="mx-1">${meal.name}</h4>
+                  <div
+                    class="fs-1 bg-primary text-white text-center rounded-2 px-2 px-sm-5"
+                  >
+                    ${meal.calories}
+                  </div>
+                  <button class="delete btn btn-danger btn-sm mx-2">
+                    <i class="fa-solid fa-xmark"></i>
+                  </button>
+                </div>
+            </div>`;
+    mealsEL.appendChild(mealEL);
+  }
+
+  _displayNewWorkout(workout) {
+    const workoutsEL = document.getElementById("workout-items");
+    const workoutEL = document.createElement("div");
+    workoutEL.classList.add("card", "my-2");
+    workoutEL.setAttribute("data.id", workout.id);
+    workoutEL.innerHTML = `<div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                  <h4 class="mx-1">${workout.name}</h4>
+                  <div
+                    class="fs-1 bg-secondary text-white text-center rounded-2 px-2 px-sm-5"
+                  >
+                    ${workout.calories}
+                  </div>
+                  <button class="delete btn btn-danger btn-sm mx-2">
+                    <i class="fa-solid fa-xmark"></i>
+                  </button>
+                </div>
+              
+            </div>`;
+    workoutsEL.appendChild(workoutEL);
+  }
   _render() {
     this._displayCaloriesTotal();
     this._displayCaloriesLimit();
@@ -89,7 +133,14 @@ class CalorieTracker {
     const progressElement = document.querySelector("#calorie-progress");
 
     const percentage = (this._totalCalories / this._calorieLimit) * 100;
-    const width = Math.min(percentage, 100);
+    let width;
+    if (percentage <= 0) {
+      width = Math.min(0, 100);
+    } else {
+      width = Math.min(percentage, 100);
+    }
+    console.log(percentage);
+
     progressElement.style.width = `${width}%`;
   }
 }
