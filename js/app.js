@@ -2,7 +2,7 @@ class CalorieTracker {
   constructor() {
     this._calorieLimit = Storage.getCalorieLimit();
     this._totalCalories = 0;
-    this._meals = [];
+    this._meals = Storage.getMeals();
     this._workout = [];
 
     this._displayCaloriesTotal();
@@ -15,6 +15,7 @@ class CalorieTracker {
 
   addMeal(meal) {
     this._meals.push(meal);
+    Storage.saveMeal(meal);
     this._totalCalories += meal.calories;
     Storage.updateTotalCalories(this._totalCalories);
     this._displayNewMeal(meal);
@@ -66,6 +67,10 @@ class CalorieTracker {
     Storage.setCaloriLimit(calories);
     this._displayCaloriesLimit();
     this._render();
+  }
+
+  loadItem() {
+    this._meals.forEach((meal) => this._displayNewMeal(meal));
   }
 
   _displayCaloriesTotal() {
@@ -231,6 +236,22 @@ class Storage {
   static updateTotalCalories(calories) {
     localStorage.setItem("totalCalories", calories);
   }
+
+  static getMeals() {
+    let meals;
+    if (localStorage.getItem("meals") === null) {
+      meals = [];
+    } else {
+      meals = JSON.parse(localStorage.getItem("meals"));
+    }
+    return meals;
+  }
+
+  static saveMeal(meal) {
+    const meals = Storage.getMeals();
+    meals.push(meal);
+    localStorage.setItem("meals", JSON.stringify(meals));
+  }
 }
 
 class App {
@@ -268,6 +289,8 @@ class App {
     document
       .querySelector("#limit-form")
       .addEventListener("submit", this._setLimit.bind(this));
+
+    this._tracker.loadItem();
   }
 
   _newMeal(e) {
